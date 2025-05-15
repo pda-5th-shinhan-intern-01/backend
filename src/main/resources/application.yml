@@ -3,7 +3,7 @@ spring:
     name: hotsignal
 
 ---
-#??
+
 spring:
   config:
     activate:
@@ -14,7 +14,7 @@ spring:
     password: root
 
 ---
-#??
+
 spring:
   config:
     activate:
