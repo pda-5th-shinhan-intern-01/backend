@@ -55,6 +55,9 @@ jobs:
               docker rm $CONTAINER_ID
             fi
 
+            echo "🧹 Cleaning up old container name if still reserved..."
+            docker rm -f hotsignal-backend-api || true
+
             echo "📦 Pulling latest image..."
             docker pull kimdongjae/hotsignal-backend-api:latest
 
