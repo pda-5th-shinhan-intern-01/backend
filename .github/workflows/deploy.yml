@@ -37,20 +37,28 @@ jobs:
       - name: Push Docker image
         run: docker push kimdongjae/hotsignal-backend-api:latest
 
-      - name: Deploy to backend server via Bastion
+      - name: Deploy to backend server
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.BACKEND_PRIVATE_IP }}
-          username: ubuntu
+          host: ${{ secrets.SSH_HOST_BACKEND }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-          proxy_host: ${{ secrets.BASTION_PUBLIC_IP }}
-          proxy_username: ubuntu
-          proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
-
+          proxy_host: ${{ secrets.SSH_PROXY_HOST }}
+          proxy_username: ${{ secrets.SSH_PROXY_USER }}
+          proxy_key: ${{ secrets.SSH_PROXY_KEY }}
           script: |
-            docker rm -f hotsignal-backend-api || true
+            echo "🔍 Checking for container using port 8080..."
+            CONTAINER_ID=$(docker ps -q --filter "publish=8080")
+            if [ ! -z "$CONTAINER_ID" ]; then
+              echo "🛑 Stopping container on 8080: $CONTAINER_ID"
+              docker stop $CONTAINER_ID
+              docker rm $CONTAINER_ID
+            fi
+
+            echo "📦 Pulling latest image..."
             docker pull kimdongjae/hotsignal-backend-api:latest
+
+            echo "🚀 Running new container..."
             docker run -d -p 8080:8080 \
               --name hotsignal-backend-api \
               -e SPRING_PROFILES_ACTIVE=dev \
