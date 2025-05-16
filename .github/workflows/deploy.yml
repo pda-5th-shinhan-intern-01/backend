@@ -37,12 +37,17 @@ jobs:
       - name: Push Docker image
         run: docker push kimdongjae/hotsignal-backend-api:latest
 
-      - name: Deploy to backend server
+      - name: Deploy to backend server via Bastion
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.SSH_HOST_BACKEND }}
-          username: ${{ secrets.SSH_USER }}
+          host: ${{ secrets.BACKEND_PRIVATE_IP }}
+          username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+          proxy_host: ${{ secrets.BASTION_PUBLIC_IP }}
+          proxy_username: ubuntu
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
           script: |
             docker rm -f hotsignal-backend-api || true
             docker pull kimdongjae/hotsignal-backend-api:latest
