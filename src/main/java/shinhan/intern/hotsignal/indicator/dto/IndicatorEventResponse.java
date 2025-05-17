@@ -13,9 +13,9 @@ public class IndicatorEventResponse {
     private String name;
     private IndicatorDto indicator;
     private String date;
-    private Double expectedValue;
-    private Double prevValue;
-    private Double actualValue;
+    private String expectedValue;
+    private String prevValue;
+    private String actualValue;
     private String unit;
 
     @Data
