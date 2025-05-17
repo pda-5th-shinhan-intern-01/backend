@@ -3,6 +3,7 @@ package shinhan.intern.hotsignal.indicator.service;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
