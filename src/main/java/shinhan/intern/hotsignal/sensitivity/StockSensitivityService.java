@@ -91,7 +91,7 @@ public class StockSensitivityService {
         };
     }
 
-    public List<SensitivityChartDTO> findChartDataByStockTicker(String ticker) {
+    public List<SensitivityChartDTO> findChartDataByStockTicker(String ticker,String sortedBy) {
         List<String> codes = indicatorRepository.findDistinctCodes();
         List<SensitivityChartDTO> result = new ArrayList<>();
 
@@ -115,6 +115,8 @@ public class StockSensitivityService {
                                     .volume(s.getVolume())
                                     .build())
                             .collect(Collectors.toList());
+            StockSensitivity sensitivity = stockSensitivityRepository.findByStock_TickerAndIndicator_Code(ticker,code);
+            Double score = sensitivity != null ? sensitivity.getScore() : null;
 
             result.add(SensitivityChartDTO.builder()
                     .indicatorCode(code)
@@ -124,10 +126,12 @@ public class StockSensitivityService {
                     .actual(latest.getValue())
                     .delta(delta)
                     .unit(resolveUnit(latest.getCode(),""))
+                    .score(score)
                     .stockRate(rate)
                     .price(charts)
                     .build());
         }
+        result.sort(getComparatorChart(sortedBy));
         return result;
     }
 
@@ -165,7 +169,7 @@ public class StockSensitivityService {
             Map.entry("INDUSTRIAL_PRODUCTION", "산업생산 지표에 민감한 종목은?")
     );
 
-    public List<SensitivityPerformanceDTO> findExpectedPerformance(String ticker) {
+    public List<SensitivityPerformanceDTO> findExpectedPerformance(String ticker, String sortedBy) {
         // 가장 최근 종목 id 찾기
         Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
 
@@ -207,10 +211,7 @@ public class StockSensitivityService {
                     .indicatorName(indicator.getName())
                     .build());
         }
-        result.sort(Comparator.comparing(dto -> LocalDateTime.of(
-                dto.getDate(),
-                dto.getTime() != null ? dto.getTime() : LocalTime.MIDNIGHT
-        )));
+        result.sort(getComparator(sortedBy));
         return result;
     }
     
@@ -230,5 +231,34 @@ public class StockSensitivityService {
         if (value == null) return null;
         // 숫자와 . 만 제거 → 남는 건 단위
         return value.replaceAll("[0-9.\\-]", "").trim();
+    }
+
+    //정렬
+    private Comparator<SensitivityPerformanceDTO> getComparator(String sortBy) {
+        switch (sortBy.toLowerCase()) {
+            case "performance":
+                return Comparator.comparing(SensitivityPerformanceDTO::getPerformance,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+            case "score":
+                return Comparator.comparing(SensitivityPerformanceDTO::getScore,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+            case "closet":
+            default:
+                return Comparator.comparing(dto -> LocalDateTime.of(
+                        dto.getDate(),
+                        dto.getTime() != null ? dto.getTime() : LocalTime.MIDNIGHT
+                ));
+        }
+    }
+    private Comparator<SensitivityChartDTO> getComparatorChart(String sortedBy) {
+        switch (sortedBy.toLowerCase()) {
+            case "score":
+                return Comparator.comparing(SensitivityChartDTO::getScore,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+            case "date":
+            default:
+                return Comparator.comparing(SensitivityChartDTO::getDate,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+        }
     }
 }

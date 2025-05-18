@@ -22,5 +22,6 @@ public class SensitivityChartDTO {
     private Double delta;
     private String unit;
     private Double stockRate;
+    private Double score;
     private List<StockChartDTO> price;
 }
