@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import shinhan.intern.hotsignal.indicator.Indicator;
+import shinhan.intern.hotsignal.indicator.entity.Indicator;
 import shinhan.intern.hotsignal.sector.Sector;
 
 import java.time.LocalDateTime;
