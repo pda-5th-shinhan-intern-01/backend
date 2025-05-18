@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import shinhan.intern.hotsignal.sector.dto.SectorDTO;
 import shinhan.intern.hotsignal.sector.dto.SectorDetailDTO;
 import shinhan.intern.hotsignal.stock.Stock;
+import shinhan.intern.hotsignal.stock.StockService;
 import shinhan.intern.hotsignal.stock.dto.StockTodayDTO;
 
 
@@ -16,6 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SectorService {
     private final SectorRepository sectorRepository;
+    private final StockService stockService;
 
     public ResponseEntity<List<SectorDTO>> findAllSectors() {
         List<Sector> sectors = sectorRepository.findAll();
@@ -43,6 +45,7 @@ public class SectorService {
                         .ticker(s.getTicker())
                         .volume(s.getVolume())
                         .marketCap(s.getMarketCap())
+                        .changeRate(stockService.calculateStockChange(s.getTicker()))
                         .build())
                 .toList();
         res.setStocks(st);

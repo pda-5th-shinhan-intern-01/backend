@@ -15,4 +15,5 @@ public class StockTodayDTO {
     private Double price;
     private Long volume;
     private Long marketCap;
+    private Double changeRate;
 }
