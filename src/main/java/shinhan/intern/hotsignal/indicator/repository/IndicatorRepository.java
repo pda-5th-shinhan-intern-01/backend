@@ -15,7 +15,7 @@ public interface IndicatorRepository extends JpaRepository<Indicator, Long> {
 
     @Query("SELECT DISTINCT i.code FROM Indicator i")
     List<String> findDistinctCodes();
-
+    List<Indicator> findAllByCode(String code);
     List<Indicator> findByCodeOrderByDateDesc(String code);
 
 }
