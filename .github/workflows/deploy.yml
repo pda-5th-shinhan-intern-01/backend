@@ -66,10 +66,10 @@ jobs:
             docker pull kimdongjae/hotsignal-backend-api:latest
 
             echo "🚀 Running new container..."
-            docker run -d --network host -p 8080:8080 \
+            docker run -d -p 8080:8080 \
               --name hotsignal-backend-api \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              -e SPRING_DATASOURCE_URL=${{secrets.DB_URL}} \
-              -e SPRING_DATASOURCE_USERNAME=${{secrets.DB_USER}} \
-              -e SPRING_DATASOURCE_PASSWORD=${{secrets.DB_PASSWORD}} \
+              -e "SPRING_PROFILES_ACTIVE=prod" \
+              -e "SPRING_DATASOURCE_URL=${{secrets.DB_URL}}" \
+              -e "SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USER }}" \
+              -e "SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}" \
               kimdongjae/hotsignal-backend-api:latest

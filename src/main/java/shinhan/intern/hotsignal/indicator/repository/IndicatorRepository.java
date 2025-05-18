@@ -1,6 +1,7 @@
 package shinhan.intern.hotsignal.indicator.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +17,6 @@ public interface IndicatorRepository extends JpaRepository<Indicator, Long> {
     List<String> findDistinctCodes();
 
     List<Indicator> findByCodeOrderByDateDesc(String code);
+
 }
 
