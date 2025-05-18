@@ -5,8 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shinhan.intern.hotsignal.indicator.entity.Indicator;
 import shinhan.intern.hotsignal.indicator.repository.IndicatorRepository;
-import shinhan.intern.hotsignal.sensitivity.dto.SensitivityChartDTO;
-import shinhan.intern.hotsignal.sensitivity.dto.SensitivityDTO;
+import shinhan.intern.hotsignal.sensitivity.dto.*;
 import shinhan.intern.hotsignal.sensitivity.dto.StockSensitivityDTO;
 import shinhan.intern.hotsignal.sensitivity.dto.StockSensitivityRankDTO;
 import shinhan.intern.hotsignal.stock.Stock;
@@ -15,9 +14,7 @@ import shinhan.intern.hotsignal.stock.StockService;
 import shinhan.intern.hotsignal.stock.dto.StockChartDTO;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -55,6 +52,7 @@ public class StockSensitivityService {
                     .indicatorId(Long.valueOf(indicator.getId()))
                     .indicatorCode(indicator.getCode())
                     .indicatorName(indicator.getName())
+                    .phrase(indicatorPhraseMap.get(indicator.getCode()))
                     .topStocks(stocks)
                     .build());
         }
@@ -152,5 +150,14 @@ public class StockSensitivityService {
         // 등락률 = (종료일 종가 - 기준일 종가) / 기준일 종가
         return (end.getClosePrice() - base.getClosePrice()) / base.getClosePrice();
     }
-
+    private static final Map<String, String> indicatorPhraseMap = Map.ofEntries(
+            Map.entry("CORE_CPI", "근원 CPI에 반응한 종목은?"),
+            Map.entry("CORE_PPI", "근원 PPI 발표 이후 움직임이 큰 종목은?"),
+            Map.entry("CORE_PCE", "소비자 심리에 반응한 종목은?"),
+            Map.entry("NFP", "고용 발표 후 움직인 종목은?"),
+            Map.entry("UNEMPLOYMENT", "실업률에 민감하게 반응한 종목은?"),
+            Map.entry("RETAIL_SALES", "소비지표에 반응한 대표 종목은?"),
+            Map.entry("GDP", "GDP 발표 후 움직인 종목은?"),
+            Map.entry("INDUSTRIAL_PRODUCTION", "산업생산 지표에 민감한 종목은?")
+    );
 }
