@@ -3,8 +3,12 @@ package shinhan.intern.hotsignal.sensitivity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import shinhan.intern.hotsignal.indicator.Indicator;
+import shinhan.intern.hotsignal.indicator.entity.Indicator;
+import shinhan.intern.hotsignal.sensitivity.dto.SensitivityDTO;
+import shinhan.intern.hotsignal.sensitivity.dto.StockSensitivityDTO;
+import shinhan.intern.hotsignal.sensitivity.dto.StockSensitivityRankDTO;
 import shinhan.intern.hotsignal.stock.Stock;
+import shinhan.intern.hotsignal.stock.StockRepository;
 import shinhan.intern.hotsignal.stock.StockService;
 
 import java.util.ArrayList;
@@ -15,6 +19,8 @@ import java.util.List;
 public class StockSensitivityService {
     private final StockSensitivityRepository stockSensitivityRepository;
     private final StockService stockService;
+    private final StockRepository stockRepository;
+
     public ResponseEntity<List<StockSensitivityRankDTO>> findTop10ForAllIndicators() {
         List<Long> indicatorIds = stockSensitivityRepository.findDistinctIndicatorIds();
         List<StockSensitivityRankDTO> result = new ArrayList<>();
@@ -47,5 +53,18 @@ public class StockSensitivityService {
         }
 
         return ResponseEntity.ok(result);
+    }
+
+    public ResponseEntity<List<SensitivityDTO>> findAllByStockTicker(String ticker){
+        Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
+        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
+        return sensitivities.stream()
+                .map(s->{
+                    SensitivityDTO.builder()
+                            .indicatorCode(s.getIndicator().getCode())
+                            .indicatorName(s.getIndicator().getName())
+                            .sensitivity(s.getScore())
+                            .unit(s.getUnit())
+                })
     }
 }
