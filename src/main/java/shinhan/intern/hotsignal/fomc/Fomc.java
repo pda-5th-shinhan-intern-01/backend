@@ -17,8 +17,10 @@ public class Fomc {
     private Long id;
 
     private String title;
-
+    
+    @Column(columnDefinition = "TEXT")
     private String content;
+    
     private LocalDate date;
 
     @Column(name="policy_bias")
