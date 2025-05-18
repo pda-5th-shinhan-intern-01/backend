@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
 import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
 import shinhan.intern.hotsignal.indicator.service.IndicatorService;
-import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
 
 
 @RestController
@@ -29,6 +28,11 @@ public class IndicatorController {
         } else {
             return ResponseEntity.ok(indicatorService.getIndicatorEventsByIndicatorId(indicator_id));
         }
+    }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<List<IndicatorEventResponse>> getEvents(){
+        return ResponseEntity.ok(indicatorService.getAllEconomicEvents());
     }
 
     @GetMapping("/{indicatorCode}/chart")

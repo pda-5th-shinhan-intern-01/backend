@@ -84,9 +84,9 @@ public class StockSensitivityService {
 
         return switch (code.toUpperCase()) {
             case "CPI", "PPI", "CORE_PCE", "GDP", "UNEMPLOYMENT",
-                 "RETAIL_SALES", "CORE_CPI", "CORE_PPI", "INDUSTRIAL_PRODUCTION" -> "%";
+                "CORE_CPI", "CORE_PPI", "INDUSTRIAL_PRODUCTION" -> "%";
             case "ISM" -> "";
-            case "NFP", "PAYROLL" -> "K";
+            case "NFP", "PAYROLL","RETAIL_SALES" -> "K";
             default -> "unknown";
         };
     }
