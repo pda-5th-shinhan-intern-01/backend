@@ -12,4 +12,7 @@ public interface StockSensitivityRepository extends JpaRepository<StockSensitivi
     List<StockSensitivity> findTop10ByIndicatorIdOrderByPerformanceDesc(Long indicatorId);
 
     List<StockSensitivity> findAllByStockId(Long id);
+
+    StockSensitivity findByStock_TickerAndIndicator_Code(String ticker, String code);
+
 }

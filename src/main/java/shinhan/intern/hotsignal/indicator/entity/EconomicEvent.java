@@ -1,6 +1,7 @@
 package shinhan.intern.hotsignal.indicator.entity;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 import jakarta.persistence.Column;
@@ -23,6 +24,9 @@ public class EconomicEvent {
 
     @Column(name = "date")
     private LocalDate date;
+
+    @Column(name="time")
+    private LocalTime time;
 
     @Column(name = "forecast")
     private String forecast;

@@ -3,7 +3,9 @@ package shinhan.intern.hotsignal.sensitivity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
 import shinhan.intern.hotsignal.indicator.entity.Indicator;
+import shinhan.intern.hotsignal.indicator.repository.EconomicEventRepository;
 import shinhan.intern.hotsignal.indicator.repository.IndicatorRepository;
 import shinhan.intern.hotsignal.sensitivity.dto.*;
 import shinhan.intern.hotsignal.sensitivity.dto.StockSensitivityDTO;
@@ -14,6 +16,8 @@ import shinhan.intern.hotsignal.stock.StockService;
 import shinhan.intern.hotsignal.stock.dto.StockChartDTO;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,8 +28,8 @@ public class StockSensitivityService {
     private final StockService stockService;
     private final StockRepository stockRepository;
     private final IndicatorRepository indicatorRepository;
-
-    public ResponseEntity<List<StockSensitivityRankDTO>> findTop10ForAllIndicators() {
+    private final EconomicEventRepository economicEventRepository;
+    public List<StockSensitivityRankDTO> findTop10ForAllIndicators() {
         List<Long> indicatorIds = stockSensitivityRepository.findDistinctIndicatorIds();
         List<StockSensitivityRankDTO> result = new ArrayList<>();
 
@@ -57,11 +61,11 @@ public class StockSensitivityService {
                     .build());
         }
 
-        return ResponseEntity.ok(result);
+        return result;
     }
 
 
-    public ResponseEntity<List<SensitivityDTO>> findAllByStockTicker(String ticker){
+    public List<SensitivityDTO> findAllByStockTicker(String ticker){
         Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
         List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
         List<SensitivityDTO> dtoList = sensitivities.stream()
@@ -73,21 +77,21 @@ public class StockSensitivityService {
                         .build()
                 ).toList();
 
-        return ResponseEntity.ok(dtoList);
+        return dtoList;
     }
     private String resolveUnit(String code, String rawUnit) {
         if (rawUnit != null && !rawUnit.isBlank()) return rawUnit;
 
         return switch (code.toUpperCase()) {
             case "CPI", "PPI", "CORE_PCE", "GDP", "UNEMPLOYMENT",
-                 "RETAIL_SALES", "CORE_CPI", "CORE_PPI", "INDUSTRIAL_PRODUCTION" -> "%";
+                "CORE_CPI", "CORE_PPI", "INDUSTRIAL_PRODUCTION" -> "%";
             case "ISM" -> "";
-            case "NFP", "PAYROLL" -> "K";
+            case "NFP", "PAYROLL","RETAIL_SALES" -> "K";
             default -> "unknown";
         };
     }
 
-    public ResponseEntity<List<SensitivityChartDTO>> findChartDataByStockTicker(String ticker) {
+    public List<SensitivityChartDTO> findChartDataByStockTicker(String ticker,String sortedBy) {
         List<String> codes = indicatorRepository.findDistinctCodes();
         List<SensitivityChartDTO> result = new ArrayList<>();
 
@@ -111,6 +115,8 @@ public class StockSensitivityService {
                                     .volume(s.getVolume())
                                     .build())
                             .collect(Collectors.toList());
+            StockSensitivity sensitivity = stockSensitivityRepository.findByStock_TickerAndIndicator_Code(ticker,code);
+            Double score = sensitivity != null ? sensitivity.getScore() : null;
 
             result.add(SensitivityChartDTO.builder()
                     .indicatorCode(code)
@@ -120,11 +126,13 @@ public class StockSensitivityService {
                     .actual(latest.getValue())
                     .delta(delta)
                     .unit(resolveUnit(latest.getCode(),""))
+                    .score(score)
                     .stockRate(rate)
                     .price(charts)
                     .build());
         }
-        return ResponseEntity.ok(result);
+        result.sort(getComparatorChart(sortedBy));
+        return result;
     }
 
     public Double calculateReturnRate(List<Stock> trend, LocalDate eventDate) {
@@ -160,4 +168,97 @@ public class StockSensitivityService {
             Map.entry("GDP", "GDP 발표 후 움직인 종목은?"),
             Map.entry("INDUSTRIAL_PRODUCTION", "산업생산 지표에 민감한 종목은?")
     );
+
+    public List<SensitivityPerformanceDTO> findExpectedPerformance(String ticker, String sortedBy) {
+        // 가장 최근 종목 id 찾기
+        Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
+
+        // 그걸로 예상 퍼포먼스 찾기
+        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
+        // 지표id로 정보 가져와서 제공
+        List<SensitivityPerformanceDTO> result = new ArrayList<>();
+        for (StockSensitivity s : sensitivities) {
+            Indicator indicator = s.getIndicator();
+            Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorAndDateAfterOrderByDateAsc(indicator,LocalDate.now());
+            if(Oevent.isEmpty()) continue;
+            EconomicEvent event = Oevent.get();
+            String prevStr = event.getPrevious();    // 예: "3.2%"
+            String forecastStr = event.getForecast(); // 예: "3.4%"
+
+            // 숫자 추출
+            Double prev = parseDouble(prevStr);
+            Double forecast = parseDouble(forecastStr);
+            Double delta = (prev != null && forecast != null) ? forecast - prev : null;
+            Double beta = s.getScore();
+            Double performance = (delta != null && beta != null) ? delta * beta : null;
+            // 단위 추출: 맨 뒤의 비숫자 문자열
+            String unit = extractUnit(forecastStr != null ? forecastStr : prevStr);
+
+            if (performance==null) continue;
+            if ("%".equals(unit) && performance != null) {
+                performance = performance * 100;
+            }
+            result.add(SensitivityPerformanceDTO.builder()
+                    .performance(performance)
+                    .score(s.getScore())
+                    .forecast(forecast)
+                    .prev(prev)
+                    .delta(delta)
+                    .unit(unit)
+                    .date(event.getDate())
+                    .time(event.getTime())
+                    .indicatorCode(indicator.getCode())
+                    .indicatorName(indicator.getName())
+                    .build());
+        }
+        result.sort(getComparator(sortedBy));
+        return result;
+    }
+    
+    //파싱 메소드
+    private Double parseDouble(String value) {
+        if (value == null) return null;
+        try {
+            // 숫자와 소수점만 남기고 파싱
+            String numeric = value.replaceAll("[^0-9.\\-]", "");
+            return numeric.isEmpty() ? null : Double.parseDouble(numeric);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private String extractUnit(String value) {
+        if (value == null) return null;
+        // 숫자와 . 만 제거 → 남는 건 단위
+        return value.replaceAll("[0-9.\\-]", "").trim();
+    }
+
+    //정렬
+    private Comparator<SensitivityPerformanceDTO> getComparator(String sortBy) {
+        switch (sortBy.toLowerCase()) {
+            case "performance":
+                return Comparator.comparing(SensitivityPerformanceDTO::getPerformance,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+            case "score":
+                return Comparator.comparing(SensitivityPerformanceDTO::getScore,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+            case "closet":
+            default:
+                return Comparator.comparing(dto -> LocalDateTime.of(
+                        dto.getDate(),
+                        dto.getTime() != null ? dto.getTime() : LocalTime.MIDNIGHT
+                ));
+        }
+    }
+    private Comparator<SensitivityChartDTO> getComparatorChart(String sortedBy) {
+        switch (sortedBy.toLowerCase()) {
+            case "score":
+                return Comparator.comparing(SensitivityChartDTO::getScore,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+            case "date":
+            default:
+                return Comparator.comparing(SensitivityChartDTO::getDate,
+                        Comparator.nullsLast(Comparator.reverseOrder()));
+        }
+    }
 }

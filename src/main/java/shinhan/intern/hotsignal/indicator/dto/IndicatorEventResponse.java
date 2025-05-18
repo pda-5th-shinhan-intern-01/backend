@@ -17,6 +17,8 @@ public class IndicatorEventResponse {
     private String prevValue;
     private String actualValue;
     private String unit;
+    private String time;
+    private String country = "US";
 
     @Data
     @Builder

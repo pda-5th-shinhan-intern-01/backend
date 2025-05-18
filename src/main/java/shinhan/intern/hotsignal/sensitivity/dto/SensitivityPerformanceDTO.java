@@ -4,24 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import shinhan.intern.hotsignal.stock.dto.StockChartDTO;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SensitivityChartDTO {
-    private String indicatorCode;
+public class SensitivityPerformanceDTO {
     private String indicatorName;
-    private LocalDate date;
+    private String indicatorCode;
     private Double prev;
-    private Double actual;
+    private Double forecast;
     private Double delta;
-    private String unit;
-    private Double stockRate;
     private Double score;
-    private List<StockChartDTO> price;
+    private Double performance;
+    private String unit;
+    private LocalDate date;
+    private LocalTime time;
 }
