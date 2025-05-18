@@ -12,6 +12,7 @@ import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
 import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
 import shinhan.intern.hotsignal.indicator.repository.EconomicEventRepository;
+import shinhan.intern.hotsignal.indicator.repository.IndicatorRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class IndicatorService {
             .collect(Collectors.toList());
     }
 
-    public List<IndicatorEventResponse> getIndicatorEventsByIndicatorId(Integer id) {
+    public List<IndicatorEventResponse> getIndicatorEventsByIndicatorId(Long id) {
         return eventRepository.findAllWithIndicator().stream()
             .filter(event -> event.getIndicator() != null && event.getIndicator().getId().equals(id))
             .map(event -> IndicatorEventResponse.builder()

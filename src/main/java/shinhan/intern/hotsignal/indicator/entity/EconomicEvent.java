@@ -16,7 +16,7 @@ import lombok.Data;
 @Table(name = "economicevent")
 public class EconomicEvent {
     @Id
-    private Integer id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
