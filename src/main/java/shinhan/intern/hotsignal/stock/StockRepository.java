@@ -7,4 +7,6 @@ import java.util.List;
 public interface StockRepository extends JpaRepository<Stock,Long>{
     List<Stock> findAllByTicker(String ticker);
     List<Stock> findTop2ByTickerOrderByDateDesc(String ticker);
+
+    Stock findTopByTickerOrderByDateDesc(String ticker);
 }

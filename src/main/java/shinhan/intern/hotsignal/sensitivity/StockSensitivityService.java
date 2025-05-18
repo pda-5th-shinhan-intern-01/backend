@@ -45,7 +45,7 @@ public class StockSensitivityService {
                     .toList();
 
             result.add(StockSensitivityRankDTO.builder()
-                    .indicatorId(indicator.getId())
+                    .indicatorId(Long.valueOf(indicator.getId()))
                     .indicatorCode(indicator.getCode())
                     .indicatorName(indicator.getName())
                     .topStocks(stocks)
@@ -58,13 +58,26 @@ public class StockSensitivityService {
     public ResponseEntity<List<SensitivityDTO>> findAllByStockTicker(String ticker){
         Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
         List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
-        return sensitivities.stream()
-                .map(s->{
-                    SensitivityDTO.builder()
-                            .indicatorCode(s.getIndicator().getCode())
-                            .indicatorName(s.getIndicator().getName())
-                            .sensitivity(s.getScore())
-                            .unit(s.getUnit())
-                })
+        List<SensitivityDTO> dtoList = sensitivities.stream()
+                .map(s -> SensitivityDTO.builder()
+                        .indicatorCode(s.getIndicator().getCode())
+                        .indicatorName(s.getIndicator().getName())
+                        .sensitivity(s.getScore())
+                        .unit(resolveUnit(s.getIndicator().getCode(), s.getUnit()))
+                        .build()
+                ).toList();
+
+        return ResponseEntity.ok(dtoList);
+    }
+    private String resolveUnit(String code, String rawUnit) {
+        if (rawUnit != null && !rawUnit.isBlank()) return rawUnit;
+
+        return switch (code.toUpperCase()) {
+            case "CPI", "PPI", "CORE_PCE", "GDP", "UNEMPLOYMENT",
+                 "RETAIL_SALES", "CORE_CPI", "CORE_PPI", "INDUSTRIAL_PRODUCTION" -> "%";
+            case "ISM" -> "";
+            case "NFP", "PAYROLL" -> "K";
+            default -> "unknown";
+        };
     }
 }
