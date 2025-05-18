@@ -57,7 +57,7 @@ public class IndicatorService {
     }
 
     public List<ChartDataResponse> getIndicatorChartData(String indicatorCode) {
-        return indicatorRepository.findByCode(indicatorCode).stream()
+        return indicatorRepository.findAllByCode(indicatorCode).stream()
             .map(indicator -> new ChartDataResponse(
                 indicator.getDate().toString(),
                 indicator.getValue()
