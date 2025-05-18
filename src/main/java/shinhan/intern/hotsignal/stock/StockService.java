@@ -8,6 +8,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import shinhan.intern.hotsignal.stock.dto.StockChartDTO;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,5 +41,28 @@ public class StockService {
         double rawChange = ((today - yesterday) / yesterday) * 100;
 
         return Math.round(rawChange * 100.0) / 100.0;
+    }
+
+    public List<Stock> get7DayPriceTrend(String ticker, LocalDate baseDate) {
+        List<Stock> before = new ArrayList<>();
+        for (int i = 3; i >= 1; i--) {
+            Stock s = stockRepository.findBeforeDateWithOffset(ticker, baseDate, i);
+            if (s != null) before.add(s);
+        }
+
+        Stock base = stockRepository.findBeforeDateWithOffset(ticker, baseDate, 0);
+
+        List<Stock> after = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            Stock s = stockRepository.findAfterDateWithOffset(ticker, baseDate, i);
+            if (s != null) after.add(s);
+        }
+
+        List<Stock> result = new ArrayList<>();
+        result.addAll(before);
+        if (base != null) result.add(base);
+        result.addAll(after);
+
+        return result;
     }
 }
