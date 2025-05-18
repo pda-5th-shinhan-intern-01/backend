@@ -38,7 +38,7 @@ public class IndicatorService {
             .collect(Collectors.toList());
     }
 
-    public List<IndicatorEventResponse> getIndicatorEventsByIndicatorId(Integer id) {
+    public List<IndicatorEventResponse> getIndicatorEventsByIndicatorId(Long id) {
         return eventRepository.findAllWithIndicator().stream()
             .filter(event -> event.getIndicator() != null && event.getIndicator().getId().equals(id))
             .map(event -> IndicatorEventResponse.builder()

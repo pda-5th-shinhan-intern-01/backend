@@ -4,13 +4,19 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import shinhan.intern.hotsignal.indicator.entity.Indicator;
 
 @Repository
-public interface IndicatorRepository extends JpaRepository<Indicator, Integer> {
-    Optional<Indicator> findByCode(String code);
-    List<Indicator> findAllByCode(String code);
+public interface IndicatorRepository extends JpaRepository<Indicator, Long> {
+    List<Indicator> findByCode(String code);
+
+    @Query("SELECT DISTINCT i.code FROM Indicator i")
+    List<String> findDistinctCodes();
+
+    List<Indicator> findByCodeOrderByDateDesc(String code);
+
 }
 

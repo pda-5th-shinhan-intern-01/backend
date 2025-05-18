@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class StockSensitivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Double id;
+    private Long id;
 
     private Double score;
     private Double performance;

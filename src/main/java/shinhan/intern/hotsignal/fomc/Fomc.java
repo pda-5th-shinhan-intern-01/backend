@@ -20,6 +20,7 @@ public class Fomc {
 
     @Column(columnDefinition = "TEXT")
     private String content;
+    
     private LocalDate date;
 
     @Column(name="policy_bias")

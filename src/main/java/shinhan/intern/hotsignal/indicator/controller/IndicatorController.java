@@ -3,14 +3,12 @@ package shinhan.intern.hotsignal.indicator.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+
+import org.springframework.web.bind.annotation.*;
 
 
 import lombok.RequiredArgsConstructor;
+import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
 import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
 import shinhan.intern.hotsignal.indicator.service.IndicatorService;
 import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
@@ -24,7 +22,7 @@ public class IndicatorController {
 
     @GetMapping
     public ResponseEntity<List<IndicatorEventResponse>> getIndicators(
-        @RequestParam(required = false) Integer indicator_id) {
+        @RequestParam(required = false) Long indicator_id) {
     
         if (indicator_id == null) {
             return ResponseEntity.ok(indicatorService.getIndicatorEvents());

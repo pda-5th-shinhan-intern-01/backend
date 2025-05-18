@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
 
 @Repository
-public interface EconomicEventRepository extends JpaRepository<EconomicEvent, Integer> {
+public interface EconomicEventRepository extends JpaRepository<EconomicEvent, Long> {
     @Query("SELECT e FROM EconomicEvent e JOIN FETCH e.indicator")
     List<EconomicEvent> findAllWithIndicator();
 }
