@@ -13,4 +13,6 @@ spring:
       hibernate:
         format_sql: true
 
+server:
+  forward-headers-strategy: framework
 
