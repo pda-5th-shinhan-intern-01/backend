@@ -12,6 +12,7 @@ import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
 import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
 import shinhan.intern.hotsignal.indicator.repository.EconomicEventRepository;
+import shinhan.intern.hotsignal.indicator.repository.IndicatorRepository;
 
 @Service
 @RequiredArgsConstructor
