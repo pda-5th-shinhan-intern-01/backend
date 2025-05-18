@@ -34,5 +34,23 @@ public class IndicatorService {
                 .build())
             .collect(Collectors.toList());
     }
+
+    public List<IndicatorEventResponse> getIndicatorEventsByIndicatorId(Integer id) {
+        return eventRepository.findAllWithIndicator().stream()
+            .filter(event -> event.getIndicator() != null && event.getIndicator().getId().equals(id))
+            .map(event -> IndicatorEventResponse.builder()
+                .name(event.getName())
+                .indicator(IndicatorEventResponse.IndicatorDto.builder()
+                    .name(event.getIndicator().getName())
+                    .code(event.getIndicator().getCode())
+                    .build())
+                .date(event.getDate().format(formatter))
+                .expectedValue(event.getForecast())
+                .prevValue(event.getPrevious())
+                .actualValue(event.getActual())
+                .unit("%")
+                .build())
+            .collect(Collectors.toList());
+    }
 }
 
