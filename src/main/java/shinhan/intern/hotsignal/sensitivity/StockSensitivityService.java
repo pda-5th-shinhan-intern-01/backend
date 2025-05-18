@@ -55,6 +55,7 @@ public class StockSensitivityService {
         return ResponseEntity.ok(result);
     }
 
+
     public ResponseEntity<List<SensitivityDTO>> findAllByStockTicker(String ticker){
         Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
         List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());

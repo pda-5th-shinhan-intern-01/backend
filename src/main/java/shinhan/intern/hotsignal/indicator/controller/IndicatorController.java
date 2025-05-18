@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,19 @@ public class IndicatorController {
     private final IndicatorService indicatorService;
 
     @GetMapping
-    public ResponseEntity<List<IndicatorEventResponse>> getIndicators() {
-        return ResponseEntity.ok(indicatorService.getIndicatorEvents());
+    public ResponseEntity<List<IndicatorEventResponse>> getIndicators(
+        @RequestParam(required = false) Integer indicator_id) {
+    
+        if (indicator_id == null) {
+            return ResponseEntity.ok(indicatorService.getIndicatorEvents());
+        } else {
+            return ResponseEntity.ok(indicatorService.getIndicatorEventsByIndicatorId(indicator_id));
+        }
+    }
+
+    @GetMapping("/{indicatorCode}/chart")
+    public ResponseEntity<List<ChartDataResponse>> getIndicatorChart(@PathVariable String indicatorCode) {
+        return ResponseEntity.ok(indicatorService.getIndicatorChartData(indicatorCode));
     }
 }
 

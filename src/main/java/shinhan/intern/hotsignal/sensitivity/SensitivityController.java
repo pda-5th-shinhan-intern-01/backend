@@ -1,4 +1,4 @@
-package shinhan.intern.hotsignal.sensitivity;
+// package shinhan.intern.hotsignal.sensitivity;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,7 @@ import java.util.List;
 public class SensitivityController {
     private final SectorSensitivityService sectorSensitivityService;
     private final StockSensitivityService stockSensitivityService;
+
 
     @GetMapping("/top")
     public ResponseEntity<List<StockSensitivityRankDTO>> getTopStocks() {
