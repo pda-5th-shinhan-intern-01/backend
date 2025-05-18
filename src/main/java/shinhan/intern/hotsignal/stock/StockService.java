@@ -28,4 +28,16 @@ public class StockService {
                         .build())
                 .toList();
     }
+
+    public Double calculateStockChange(String ticker) {
+        List<Stock> closes = stockRepository.findTop2ByTickerOrderByDateDesc(ticker);
+        if (closes.size() < 2) return null;
+
+        double today = closes.get(0).getClosePrice();
+        double yesterday = closes.get(1).getClosePrice();
+
+        double rawChange = ((today - yesterday) / yesterday) * 100;
+
+        return Math.round(rawChange * 100.0) / 100.0;
+    }
 }
