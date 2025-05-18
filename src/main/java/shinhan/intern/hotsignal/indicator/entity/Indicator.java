@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @Table(name = "indicator")
@@ -16,4 +18,8 @@ public class Indicator {
     private String name;
 
     private String code;
+
+    private LocalDate date;
+
+    private Double value;
 }
