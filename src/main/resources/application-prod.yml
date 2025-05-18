@@ -14,5 +14,6 @@ spring:
         format_sql: true
 
 server:
+  address: 0.0.0.0
   forward-headers-strategy: framework
 
