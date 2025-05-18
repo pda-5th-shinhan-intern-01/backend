@@ -28,5 +28,10 @@ public class IndicatorController {
             return ResponseEntity.ok(indicatorService.getIndicatorEventsByIndicatorId(indicator_id));
         }
     }
+
+    @GetMapping("/{indicatorCode}/chart")
+    public ResponseEntity<List<ChartDataResponse>> getIndicatorChart(@PathVariable String indicatorCode) {
+        return ResponseEntity.ok(indicatorService.getIndicatorChartData(indicatorCode));
+    }
 }
 
