@@ -3,6 +3,7 @@ package shinhan.intern.hotsignal.fomc;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -16,6 +17,7 @@ public class FomcService {
                 : fomcRepository.findAllById(ids);
 
         return fomcs.stream()
+                .sorted(Comparator.comparing(Fomc::getDate).reversed())
                 .map(f -> FomcDTO.builder()
                         .id(f.getId())
                         .title(f.getTitle())
