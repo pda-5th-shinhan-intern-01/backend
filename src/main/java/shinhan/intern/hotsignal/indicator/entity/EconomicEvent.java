@@ -4,12 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -37,8 +32,8 @@ public class EconomicEvent {
     @Column(name = "actual")
     private String actual;
 
-    @ManyToOne
-    @JoinColumn(name = "indicator_id") // 지표 ID 연결
-    private Indicator indicator;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "indicatormeta_id", referencedColumnName = "id", nullable = true)
+    private IndicatorMeta indicatorMeta;
 }
 
