@@ -2,6 +2,7 @@ package shinhan.intern.hotsignal.indicator.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
+import shinhan.intern.hotsignal.indicator.dto.IndicatorDTO;
 import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
 import shinhan.intern.hotsignal.indicator.dto.IndicatorInfoDTO;
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
@@ -178,5 +180,18 @@ public class IndicatorService {
         };
     }
 
+    public List<IndicatorDTO> getAllIndicators() {
+        return indicatorRepository.findAll().stream()
+                .sorted(Comparator.comparing(Indicator::getDate).reversed())  // 최신순
+                .map(i -> IndicatorDTO.builder()
+                        .name(i.getName())
+                        .code(i.getCode())
+                        .date(i.getDate())
+                        .value(i.getValue())
+                        .unit(resolveUnit(i.getCode(),""))  // null 방지
+                        .build())
+                .collect(Collectors.toList());
+
+    }
 }
 
