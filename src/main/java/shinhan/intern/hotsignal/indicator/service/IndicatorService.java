@@ -181,8 +181,11 @@ public class IndicatorService {
     }
 
     public List<IndicatorDTO> getAllIndicators() {
-        return indicatorRepository.findAll().stream()
-                .sorted(Comparator.comparing(Indicator::getDate).reversed())  // 최신순
+        return indicatorRepository.findAllByOrderByDateDesc().stream()
+                .sorted(Comparator.comparing(
+                        Indicator::getDate,
+                        Comparator.nullsLast(Comparator.naturalOrder())
+                ).reversed())
                 .map(i -> IndicatorDTO.builder()
                         .name(i.getName())
                         .code(i.getCode())
