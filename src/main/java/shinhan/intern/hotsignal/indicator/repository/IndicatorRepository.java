@@ -18,5 +18,7 @@ public interface IndicatorRepository extends JpaRepository<Indicator, Long> {
     List<Indicator> findAllByCode(String code);
     List<Indicator> findByCodeOrderByDateDesc(String code);
 
+    Indicator findTopByCodeOrderByDateDesc(String indicatorCode);
+
 }
 

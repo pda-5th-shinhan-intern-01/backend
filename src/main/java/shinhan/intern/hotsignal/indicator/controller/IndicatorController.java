@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
+import shinhan.intern.hotsignal.indicator.dto.IndicatorInfoDTO;
 import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
 import shinhan.intern.hotsignal.indicator.service.IndicatorService;
 
@@ -38,6 +39,11 @@ public class IndicatorController {
     @GetMapping("/{indicatorCode}/chart")
     public ResponseEntity<List<ChartDataResponse>> getIndicatorChart(@PathVariable String indicatorCode) {
         return ResponseEntity.ok(indicatorService.getIndicatorChartData(indicatorCode));
+    }
+
+    @GetMapping("/latest/{indicatorCode}")
+    public ResponseEntity<IndicatorInfoDTO> getIndicatorLatest(@PathVariable String indicatorCode) {
+        return ResponseEntity.ok(indicatorService.getIndicatorLatest(indicatorCode));
     }
 }
 
