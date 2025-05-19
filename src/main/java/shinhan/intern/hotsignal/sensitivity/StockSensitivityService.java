@@ -1,12 +1,12 @@
 package shinhan.intern.hotsignal.sensitivity;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
 import shinhan.intern.hotsignal.indicator.entity.Indicator;
 import shinhan.intern.hotsignal.indicator.entity.IndicatorMeta;
 import shinhan.intern.hotsignal.indicator.repository.EconomicEventRepository;
+import shinhan.intern.hotsignal.indicator.repository.IndicatorMetaRepository;
 import shinhan.intern.hotsignal.indicator.repository.IndicatorRepository;
 import shinhan.intern.hotsignal.sensitivity.dto.*;
 import shinhan.intern.hotsignal.sensitivity.dto.StockSensitivityDTO;
@@ -30,14 +30,16 @@ public class StockSensitivityService {
     private final StockRepository stockRepository;
     private final IndicatorRepository indicatorRepository;
     private final EconomicEventRepository economicEventRepository;
+    private final IndicatorMetaRepository indicatorMetaRepository;
+
     public List<StockSensitivityRankDTO> findTop10ForAllIndicators() {
-        List<Long> indicatorIds = stockSensitivityRepository.findDistinctIndicatorIds();
+        List<Long> indicatorIds = stockSensitivityRepository.findDistinctIndicatorMetaIds();
         List<StockSensitivityRankDTO> result = new ArrayList<>();
 
         for (Long indicatorId : indicatorIds) {
             List<StockSensitivity> top10 = stockSensitivityRepository
-                    .findTop10ByIndicatorMeta_IdOrderByPerformanceDesc(indicatorId);
-            IndicatorMeta indicator = top10.get(0).getIndicatorMeta(); // 모든 항목 동일
+                    .findTop10ByIndicatorMeta_IdOrderByScoreDesc(indicatorId);
+            IndicatorMeta indicator = indicatorMetaRepository.findById(indicatorId).orElse(null);
 
             List<StockSensitivityDTO> stocks = top10.stream()
                     .map(s -> {
