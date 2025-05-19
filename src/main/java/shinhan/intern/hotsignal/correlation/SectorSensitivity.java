@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import shinhan.intern.hotsignal.indicator.entity.Indicator;
+import shinhan.intern.hotsignal.indicator.entity.IndicatorMeta;
 import shinhan.intern.hotsignal.sector.Sector;
 
 import java.time.LocalDateTime;
@@ -31,8 +32,8 @@ public class SectorSensitivity {
     private String window;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "indicator_id", nullable = false)
-    private Indicator indicator;
+    @JoinColumn(name = "indicatormeta_id", referencedColumnName = "id", nullable = true)
+    private IndicatorMeta indicatorMeta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sector_id", nullable = false)

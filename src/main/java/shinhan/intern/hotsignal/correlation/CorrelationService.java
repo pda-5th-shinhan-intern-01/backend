@@ -19,7 +19,7 @@ public class CorrelationService {
 
     public HeatMapDTO toMatrix(List<SectorSensitivity> data) {
         List<String> indicators = data.stream()
-                .map(s -> s.getIndicator().getCode())
+                .map(s -> s.getIndicatorMeta().getCode())
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
@@ -33,7 +33,7 @@ public class CorrelationService {
         Map<String, Map<String, Double>> grouped = new HashMap<>();
         for (SectorSensitivity item : data) {
             grouped
-                    .computeIfAbsent(item.getIndicator().getCode(), k -> new HashMap<>())
+                    .computeIfAbsent(item.getIndicatorMeta().getCode(), k -> new HashMap<>())
                     .put(item.getSector().getName(), item.getScore());
         }
 

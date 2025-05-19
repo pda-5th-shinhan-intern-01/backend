@@ -6,18 +6,16 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
-import shinhan.intern.hotsignal.indicator.entity.Indicator;
+import shinhan.intern.hotsignal.indicator.entity.IndicatorMeta;
 
 @Repository
 public interface EconomicEventRepository extends JpaRepository<EconomicEvent, Long> {
-    @Query("SELECT e FROM EconomicEvent e JOIN FETCH e.indicator")
-    List<EconomicEvent> findAllWithIndicator();
+    @Query("SELECT e FROM EconomicEvent e JOIN FETCH e.indicatorMeta")
+    List<EconomicEvent> findAllWithIndicatorMeta();
 
-    Optional<EconomicEvent> findFirstByIndicatorAndDateAfterOrderByDateAsc(Indicator indicator, LocalDate today);
-
+    Optional<EconomicEvent> findFirstByIndicatorMetaAndDateAfterOrderByDateAsc(IndicatorMeta indicator, LocalDate now);
 }
 

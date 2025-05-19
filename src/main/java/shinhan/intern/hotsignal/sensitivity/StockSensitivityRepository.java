@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface StockSensitivityRepository extends JpaRepository<StockSensitivity,Long> {
-    @Query("SELECT DISTINCT s.indicator.id FROM StockSensitivity s")
+    @Query("SELECT DISTINCT s.indicatorMeta.id FROM StockSensitivity s")
     List<Long> findDistinctIndicatorIds();
 
-    List<StockSensitivity> findTop10ByIndicatorIdOrderByPerformanceDesc(Long indicatorId);
+    List<StockSensitivity> findTop10ByIndicatorMeta_IdOrderByPerformanceDesc(Long indicatorId);
 
     List<StockSensitivity> findAllByStockId(Long id);
 
-    StockSensitivity findByStock_TickerAndIndicator_Code(String ticker, String code);
+    StockSensitivity findByStock_TickerAndIndicatorMeta_Code(String ticker, String code);
 
 }
