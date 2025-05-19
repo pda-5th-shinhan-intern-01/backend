@@ -17,4 +17,6 @@ public class IndicatorDTO {
     private LocalDate date;
     private Double value;
     private String unit;
+    private Double previous;
+    private Double forecast;
 }

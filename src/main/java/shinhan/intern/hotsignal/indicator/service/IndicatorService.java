@@ -28,12 +28,12 @@ public class IndicatorService {
     DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
     public List<IndicatorEventResponse> getIndicatorEvents() {
-        return eventRepository.findAllWithIndicator().stream()
+        return eventRepository.findAllWithIndicatorMeta().stream()
             .map((EconomicEvent event) -> IndicatorEventResponse.builder()
                 .name(event.getName())
                 .indicator(IndicatorEventResponse.IndicatorDto.builder()
-                    .name(event.getIndicator().getName())
-                    .code(event.getIndicator().getCode())
+                    .name(event.getIndicatorMeta().getName())
+                    .code(event.getIndicatorMeta().getCode())
                     .build())
                 .date(event.getDate().format(formatter)).time(event.getTime().toString())
                 .expectedValue(event.getForecast())
@@ -45,13 +45,13 @@ public class IndicatorService {
     }
 
     public List<IndicatorEventResponse> getIndicatorEventsByIndicatorId(Long id) {
-        return eventRepository.findAllWithIndicator().stream()
-            .filter(event -> event.getIndicator() != null && event.getIndicator().getId().equals(id))
+        return eventRepository.findAllWithIndicatorMeta().stream()
+            .filter(event -> event.getIndicatorMeta() != null && event.getIndicatorMeta().getId().equals(id))
             .map(event -> IndicatorEventResponse.builder()
                 .name(event.getName())
                 .indicator(IndicatorEventResponse.IndicatorDto.builder()
-                    .name(event.getIndicator().getName())
-                    .code(event.getIndicator().getCode())
+                    .name(event.getIndicatorMeta().getName())
+                    .code(event.getIndicatorMeta().getCode())
                     .build())
                 .date(event.getDate().format(formatter)).time(event.getTime().toString())
                 .expectedValue(
@@ -85,10 +85,10 @@ public class IndicatorService {
         return economicEventRepository.findAll().stream()
                 .map(event -> IndicatorEventResponse.builder()
                         .name(event.getName())
-                        .indicator(event.getIndicator() != null ?
+                        .indicator(event.getIndicatorMeta() != null ?
                                 IndicatorEventResponse.IndicatorDto.builder()
-                                        .name(event.getIndicator().getName())
-                                        .code(event.getIndicator().getCode())
+                                        .name(event.getIndicatorMeta().getName())
+                                        .code(event.getIndicatorMeta().getCode())
                                         .build()
                                 :null)
                         .country("USA")
@@ -137,7 +137,7 @@ public class IndicatorService {
     public IndicatorInfoDTO getIndicatorLatest(String indicatorCode) {
         Indicator indicator = indicatorRepository.findTopByCodeOrderByDateDesc(indicatorCode);
         // 해당 지표 이름에 대해서 예상치 있는지 찾아보고
-        Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorAndDateAfterOrderByDateAsc(indicator, LocalDate.now());
+        Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorMetaAndDateAfterOrderByDateAsc(indicator.getIndicatorMeta(), LocalDate.now());
 
         if(Oevent.isEmpty()){
             // 없으면
@@ -182,6 +182,7 @@ public class IndicatorService {
 
     public List<IndicatorDTO> getAllIndicators() {
         return indicatorRepository.findAllByOrderByDateDesc().stream()
+                .filter(i -> i.getValue() != null)
                 .sorted(Comparator.comparing(
                         Indicator::getDate,
                         Comparator.nullsLast(Comparator.naturalOrder())
@@ -191,7 +192,9 @@ public class IndicatorService {
                         .code(i.getCode())
                         .date(i.getDate())
                         .value(i.getValue())
-                        .unit(resolveUnit(i.getCode(),""))  // null 방지
+                        .unit(i.getUnit())
+                        .forecast(i.getForecast())
+                        .previous(i.getPrev())
                         .build())
                 .collect(Collectors.toList());
 

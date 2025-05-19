@@ -1,9 +1,7 @@
 package shinhan.intern.hotsignal.indicator.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 
@@ -24,4 +22,12 @@ public class Indicator {
     private LocalDate date;
 
     private Double value;
+
+    private Double prev;
+    private Double forecast;
+    private String unit;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "indicatormeta_id", referencedColumnName = "id", nullable = true)
+    private IndicatorMeta indicatorMeta;
 }

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
 import shinhan.intern.hotsignal.indicator.entity.Indicator;
+import shinhan.intern.hotsignal.indicator.entity.IndicatorMeta;
 import shinhan.intern.hotsignal.indicator.repository.EconomicEventRepository;
 import shinhan.intern.hotsignal.indicator.repository.IndicatorRepository;
 import shinhan.intern.hotsignal.sensitivity.dto.*;
@@ -35,8 +36,8 @@ public class StockSensitivityService {
 
         for (Long indicatorId : indicatorIds) {
             List<StockSensitivity> top10 = stockSensitivityRepository
-                    .findTop10ByIndicatorIdOrderByPerformanceDesc(indicatorId);
-            Indicator indicator = top10.get(0).getIndicator(); // 모든 항목 동일
+                    .findTop10ByIndicatorMeta_IdOrderByPerformanceDesc(indicatorId);
+            IndicatorMeta indicator = top10.get(0).getIndicatorMeta(); // 모든 항목 동일
 
             List<StockSensitivityDTO> stocks = top10.stream()
                     .map(s -> {
@@ -70,10 +71,10 @@ public class StockSensitivityService {
         List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
         List<SensitivityDTO> dtoList = sensitivities.stream()
                 .map(s -> SensitivityDTO.builder()
-                        .indicatorCode(s.getIndicator().getCode())
-                        .indicatorName(s.getIndicator().getName())
+                        .indicatorCode(s.getIndicatorMeta().getCode())
+                        .indicatorName(s.getIndicatorMeta().getName())
                         .sensitivity(s.getScore())
-                        .unit(resolveUnit(s.getIndicator().getCode(), s.getUnit()))
+                        .unit(resolveUnit(s.getIndicatorMeta().getCode(), s.getUnit()))
                         .build()
                 ).toList();
 
@@ -115,7 +116,7 @@ public class StockSensitivityService {
                                     .volume(s.getVolume())
                                     .build())
                             .collect(Collectors.toList());
-            StockSensitivity sensitivity = stockSensitivityRepository.findByStock_TickerAndIndicator_Code(ticker,code);
+            StockSensitivity sensitivity = stockSensitivityRepository.findByStock_TickerAndIndicatorMeta_Code(ticker,code);
             Double score = sensitivity != null ? sensitivity.getScore() : null;
 
             result.add(SensitivityChartDTO.builder()
@@ -178,12 +179,12 @@ public class StockSensitivityService {
         // 지표id로 정보 가져와서 제공
         List<SensitivityPerformanceDTO> result = new ArrayList<>();
         for (StockSensitivity s : sensitivities) {
-            Indicator indicator = s.getIndicator();
-            Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorAndDateAfterOrderByDateAsc(indicator,LocalDate.now());
+            IndicatorMeta indicator = s.getIndicatorMeta();
+            Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorMetaAndDateAfterOrderByDateAsc(indicator,LocalDate.now());
             if(Oevent.isEmpty()) continue;
             EconomicEvent event = Oevent.get();
-            String prevStr = event.getPrevious();    // 예: "3.2%"
-            String forecastStr = event.getForecast(); // 예: "3.4%"
+            String prevStr = event.getPrevious();
+            String forecastStr = event.getForecast();
 
             // 숫자 추출
             Double prev = parseDouble(prevStr);
