@@ -1,5 +1,6 @@
 package shinhan.intern.hotsignal.indicator.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,5 +21,6 @@ public interface IndicatorRepository extends JpaRepository<Indicator, Long> {
 
     Indicator findTopByCodeOrderByDateDesc(String indicatorCode);
 
+    List<Indicator>findAllByOrderByDateDesc();
 }
 
