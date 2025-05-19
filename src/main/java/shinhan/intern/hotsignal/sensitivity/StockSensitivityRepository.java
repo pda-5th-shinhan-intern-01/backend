@@ -7,12 +7,11 @@ import java.util.List;
 
 public interface StockSensitivityRepository extends JpaRepository<StockSensitivity,Long> {
     @Query("SELECT DISTINCT s.indicatorMeta.id FROM StockSensitivity s")
-    List<Long> findDistinctIndicatorIds();
-
-    List<StockSensitivity> findTop10ByIndicatorMeta_IdOrderByPerformanceDesc(Long indicatorId);
+    List<Long> findDistinctIndicatorMetaIds();
 
     List<StockSensitivity> findAllByStockId(Long id);
 
     StockSensitivity findByStock_TickerAndIndicatorMeta_Code(String ticker, String code);
 
+    List<StockSensitivity> findTop10ByIndicatorMeta_IdOrderByScoreDesc(Long indicatorId);
 }
