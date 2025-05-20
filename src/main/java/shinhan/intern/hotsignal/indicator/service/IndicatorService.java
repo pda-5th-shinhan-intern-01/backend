@@ -10,13 +10,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
-import shinhan.intern.hotsignal.indicator.dto.IndicatorDTO;
-import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
-import shinhan.intern.hotsignal.indicator.dto.IndicatorInfoDTO;
+import shinhan.intern.hotsignal.indicator.dto.*;
 import shinhan.intern.hotsignal.indicator.entity.EconomicEvent;
 import shinhan.intern.hotsignal.indicator.entity.Indicator;
+import shinhan.intern.hotsignal.indicator.entity.IndicatorMeta;
 import shinhan.intern.hotsignal.indicator.repository.EconomicEventRepository;
+import shinhan.intern.hotsignal.indicator.repository.IndicatorMetaRepository;
 import shinhan.intern.hotsignal.indicator.repository.IndicatorRepository;
 
 @Service
@@ -25,6 +24,7 @@ public class IndicatorService {
     private final EconomicEventRepository eventRepository;
     private final IndicatorRepository indicatorRepository;
     private final EconomicEventRepository economicEventRepository;
+    private final IndicatorMetaRepository indicatorMetaRepository;
     DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
     public List<IndicatorEventResponse> getIndicatorEvents() {
@@ -198,6 +198,28 @@ public class IndicatorService {
                         .build())
                 .collect(Collectors.toList());
 
+    }
+
+    public List<CompareChartDTO> getCompareChart(String indicatorCode) {
+        IndicatorMeta meta = indicatorMetaRepository.findByCode(indicatorCode);
+        List<Indicator> indicators = indicatorRepository.findTop10ByCodeOrderByDateDesc(indicatorCode);
+
+        List<CompareChartDTO.CompareDTO> compareValues = indicators.stream()
+                .map(ind -> CompareChartDTO.CompareDTO.builder()
+                        .date(ind.getDate())
+                        .actual(ind.getValue())
+                        .expected(ind.getForecast())
+                        .build())
+                .collect(Collectors.toList());
+
+        return List.of(
+                CompareChartDTO.builder()
+                        .indicatorCode(indicatorCode)
+                        .indicatorName(meta.getName())
+                        .value(compareValues)
+                        .unit(meta.getUnit())
+                        .build()
+        );
     }
 }
 
