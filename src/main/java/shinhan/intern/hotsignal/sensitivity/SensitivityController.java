@@ -28,7 +28,7 @@ public class SensitivityController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("{ticker}")
+    @GetMapping("/{ticker}")
     public ResponseEntity<List<SensitivityDTO>> getSensitivities(@PathVariable String ticker) {
         List<SensitivityDTO> res = stockSensitivityService.findAllByStockTicker(ticker);
         if (res == null || res.isEmpty()) {
