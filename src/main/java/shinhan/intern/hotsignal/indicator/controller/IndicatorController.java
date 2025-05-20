@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import lombok.RequiredArgsConstructor;
-import shinhan.intern.hotsignal.indicator.dto.ChartDataResponse;
-import shinhan.intern.hotsignal.indicator.dto.IndicatorDTO;
-import shinhan.intern.hotsignal.indicator.dto.IndicatorInfoDTO;
-import shinhan.intern.hotsignal.indicator.dto.IndicatorEventResponse;
+import shinhan.intern.hotsignal.indicator.dto.*;
 import shinhan.intern.hotsignal.indicator.service.IndicatorService;
 
 
@@ -50,6 +47,11 @@ public class IndicatorController {
     @GetMapping("/all")
     public ResponseEntity<List<IndicatorDTO>> getAllIndicatorList(){
         return ResponseEntity.ok(indicatorService.getAllIndicators());
+    }
+
+    @GetMapping("/{indicatorCode}/forecast")
+    public ResponseEntity<List<CompareChartDTO>> getCompareChart(@PathVariable String indicatorCode){
+        return ResponseEntity.ok(indicatorService.getCompareChart(indicatorCode));
     }
 }
 

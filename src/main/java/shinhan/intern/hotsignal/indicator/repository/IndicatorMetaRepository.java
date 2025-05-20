@@ -6,4 +6,5 @@ import shinhan.intern.hotsignal.indicator.entity.IndicatorMeta;
 
 @Repository
 public interface IndicatorMetaRepository extends JpaRepository<IndicatorMeta,Long> {
+    IndicatorMeta findByCode(String indicatorCode);
 }
