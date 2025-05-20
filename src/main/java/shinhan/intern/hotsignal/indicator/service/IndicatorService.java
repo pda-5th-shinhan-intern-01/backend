@@ -137,7 +137,7 @@ public class IndicatorService {
     public IndicatorInfoDTO getIndicatorLatest(String indicatorCode) {
         Indicator indicator = indicatorRepository.findTopByCodeOrderByDateDesc(indicatorCode);
         // 해당 지표 이름에 대해서 예상치 있는지 찾아보고
-        Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorMetaAndDateAfterOrderByDateAsc(indicator.getIndicatorMeta(), LocalDate.now());
+        Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorMeta_IdAndDateAfterOrderByDateAsc(indicator.getIndicatorMeta().getId(), LocalDate.now());
 
         if(Oevent.isEmpty()){
             // 없으면

@@ -179,12 +179,14 @@ public class StockSensitivityService {
         Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
 
         // 그걸로 예상 퍼포먼스 찾기
-        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
+//        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
         // 지표id로 정보 가져와서 제공
+        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockTicker(ticker);
         List<SensitivityPerformanceDTO> result = new ArrayList<>();
         for (StockSensitivity s : sensitivities) {
             IndicatorMeta indicator = s.getIndicatorMeta();
-            Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorMetaAndDateAfterOrderByDateAsc(indicator,LocalDate.now());
+            Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorMeta_IdAndDateAfterOrderByDateAsc(indicator.getId(),LocalDate.now());
+//            Optional<EconomicEvent> Oevent = economicEventRepository.findFirstByIndicatorMeta_IdAndDateAfterOrderByDateAsc(indicator.getId(),LocalDate.now());
             if(Oevent.isEmpty()) continue;
             EconomicEvent event = Oevent.get();
             String prevStr = event.getPrevious();
