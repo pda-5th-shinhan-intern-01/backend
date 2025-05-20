@@ -69,8 +69,10 @@ public class StockSensitivityService {
 
 
     public List<SensitivityDTO> findAllByStockTicker(String ticker){
-        Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
-        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
+//        Stock stock = stockRepository.findTopByTickerOrderByDateDesc(ticker);
+//        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockId(stock.getId());
+        List<StockSensitivity> sensitivities = stockSensitivityRepository.findAllByStockTicker(ticker);
+
         List<SensitivityDTO> dtoList = sensitivities.stream()
                 .map(s -> SensitivityDTO.builder()
                         .indicatorCode(s.getIndicatorMeta().getCode())
